@@ -8,7 +8,13 @@ pub = None
 
 def callback(data):
     global pub
-    pub.publish("x: %s y: %d" % (data.p.x, data.p.y))
+     # x > 600 || x 1500 
+    # y > 5900 || y < 7000
+    x = data.p.x
+    y = data.p.y
+
+    if x > 600 and x < 1500 and y > 5900 and y < 7000:
+        pub.publish("STAPH THE TRUCK")
 
 def listener():
 
