@@ -4,25 +4,28 @@ from custom_msgs.msg import *
 from custom_msgs.srv import *
 from std_msgs.msg import String
 
-class SectionIdentifier:
-    def __init__(self):
-        self.pub = rospy.Publisher('/section_identifier', String, queue_size=10)
+pub = None
 
-        rospy.init_node('section_identifier', anonymous=True)
-        rospy.Subscriber('truck_state', TruckState, self.truckStateHandler)
-        
-    def truckStateHandler(self, data):
-         # x > 600 || x 1500 
-        # y > 5900 || y < 7000
+def callback(data):
+    global pub
+    pub.publish("x: %s y: %d" % (data.p.x, data.p.y))
 
-        self.pub.publish(data.p.x)
-        self.pub.loginfo(data.p.y)
+def listener():
 
-    def spin():
-        rate = rospy.Rate(10) # 10hz
-        while not rospy.is_shutdown():
-            rate.sleep()
+    # In ROS, nodes are uniquely named. If two nodes with the same
+    # node are launched, the previous one is kicked off. The
+    # anonymous=True flag means that rospy will choose a unique
+    # name for our 'listener' node so that multiple listeners can
+    # run simultaneously.
+    rospy.init_node('section_identifier', anonymous=True)
+
+    global pub
+    pub = rospy.Publisher('section_identifier', String, queue_size=10)
+
+    rospy.Subscriber("truck_state", TruckState, callback)
+
+    # spin() simply keeps python from exiting until this node is stopped
+    rospy.spin()
 
 if __name__ == '__main__':
-    s = SectionIdentifier()
-    # s.spin()
+    listener()
