@@ -3,7 +3,7 @@ import rospy
 from custom_msgs.msg import *
 from std_msgs.msg import String
 from helper_functions import *
-
+from section import *
 
 class SectionIdentifier:
 
@@ -47,15 +47,21 @@ class SectionIdentifier:
         intersection3 = []
         roundabout = []
 
+        section_map = SectionIdentifier.getSectionMap()
+        is1 = section_map["intersection1"]
+        is2 = section_map["intersection2"]
+        is3 = section_map["intersection3"]
+        rbt = section_map["roundabout"]
+
         for p in path:
-            if 600 < p.x < 1800 and 5600 < p.y < 7300:
+            if is1.min_x < p.x < is1.max_x and is1.min_y < p.y < is1.max_y:
                 intersection1.append(p)
-            elif 600 < p.x < 1800 and 3200 < p.y < 4700:
+            elif is2.min_x < p.x < is2.max_x and is2.min_y < p.y < is2.max_y:
                 intersection2.append(p)
-            elif 1900 < p.x < 3850 and 2550 < p.y < 5500:
-                roundabout.append(p)
-            elif 2600 < p.x < 3850 and 5600 < p.y < 7400:
+            elif is3.min_x < p.x < is3.max_x and is3.min_y < p.y < is3.max_y:
                 intersection3.append(p)
+            elif rbt.min_x < p.x < rbt.max_x and rbt.min_y < p.y < rbt.max_y:
+                roundabout.append(p)
 
         return {
             "intersection1": intersection1,
@@ -70,27 +76,39 @@ class SectionIdentifier:
             section_path = sections[section_name]
 
             if len(section_path) > 1:
-                pathAngle = getAngleBetweenPoints(section_path[0],section_path[-1])
-                self.actions[section_name] = getActionFromRadians(pathAngle)
+                path_angle = getAngleBetweenPoints(section_path[0],section_path[-1])
+                self.actions[section_name] = getActionFromRadians(path_angle)
 
         print(self.actions)
 
     def callback(self, data):
         x = data.p.x
         y = data.p.y
-        # 1# 600 < x < 1800 and 5600 < y < 7300     #  Intersection 1
-        # 2# 600 < x < 1800 and 3200 < y < 4700     #  Intersection 2
-        # 3# 1900 < x < 3800 and 2550 < y < 5400    #  Roundabout
-        # 4# 2600 < x < 3800 and 5600 < y < 7400    #  Intersection 3
 
-        if 600 < x < 1800 and 5600 < y < 7300:
+        section_map = SectionIdentifier.getSectionMap()
+        is1 = section_map["intersection1"]
+        is2 = section_map["intersection2"]
+        is3 = section_map["intersection3"]
+        rbt = section_map["roundabout"]
+
+        if is1.min_x < x < is1.max_x and is1.min_y < y < is1.max_y:
             self.pub.publish("Intersection_1")
-        elif 600 < x < 1800 and 3200 < y < 4700:
+        elif is2.min_x < x < is2.max_x and is2.min_y < y < is2.max_y:
             self.pub.publish("Intersection_2")
-        elif 1900 < x < 3850 and 2550 < y < 5500:
-            self.pub.publish("Roundabout")
-        elif 2600 < x < 3850 and 5600 < y < 7400:
+        elif is3.min_x < x < is3.max_x and is3.min_y < y < is3.max_y:
             self.pub.publish("Intersection_3")
+        elif rbt.min_x < x < rbt.max_x and rbt.min_y < y < rbt.max_y:
+            self.pub.publish("Roundabout")
+
+    @staticmethod
+    def getSectionMap():
+
+        return {
+            "intersection1": Section(600, 1800, 5600, 7300),
+            "intersection2": Section(600, 1800, 3200, 4700),
+            "intersection3": Section(2600, 3850, 5600, 7400),
+            "roundabout": Section(1900, 3850, 2550, 5500),
+        }
 
 
 if __name__ == '__main__':
