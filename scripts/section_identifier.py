@@ -4,6 +4,7 @@ from custom_msgs.msg import *
 from std_msgs.msg import String
 from helper_functions import *
 from section import *
+import math
 
 class SectionIdentifier:
 
@@ -14,7 +15,7 @@ class SectionIdentifier:
         self.pub = rospy.Publisher('section_identifier', String, queue_size=0)
 
         rospy.Subscriber("truck_state", TruckState, self.callback)
-        rospy.Subscriber("path_append", Path, self.handleNewPath)
+        rospy.Subscriber("rviz_path", Path, self.handleNewPath)
         # rospy.Subscriber("section_lock", String, self.release_callback)
 
         self.actions = {
@@ -71,12 +72,11 @@ class SectionIdentifier:
         }
 
     def setActionAtSections(self, sections):
-        for section_name in sections:
-
-            section_path = sections[section_name]
+        for section_name, section_path in sections.iteritems():
 
             if len(section_path) > 1:
                 path_angle = getAngleBetweenPoints(section_path[0],section_path[-1])
+                print section_name + " angle: " + str(path_angle*180/math.pi)
                 self.actions[section_name] = getActionFromRadians(path_angle)
 
         print(self.actions)
@@ -91,6 +91,7 @@ class SectionIdentifier:
         is3 = section_map["intersection3"]
         rbt = section_map["roundabout"]
 
+        '''
         if is1.min_x < x < is1.max_x and is1.min_y < y < is1.max_y:
             self.pub.publish("Intersection_1")
         elif is2.min_x < x < is2.max_x and is2.min_y < y < is2.max_y:
@@ -99,6 +100,7 @@ class SectionIdentifier:
             self.pub.publish("Intersection_3")
         elif rbt.min_x < x < rbt.max_x and rbt.min_y < y < rbt.max_y:
             self.pub.publish("Roundabout")
+        '''
 
     @staticmethod
     def getSectionMap():
