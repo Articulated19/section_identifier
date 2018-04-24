@@ -76,8 +76,9 @@ class SectionIdentifier:
 
             if len(section_path) > 1:
                 path_angle = getAngleBetweenPoints(section_path[0],section_path[-1])
-                print section_name + " angle: " + str(path_angle*180/math.pi)
-                self.actions[section_name] = getActionFromRadians(path_angle)
+                #print section_name + " angle: " + str(path_angle*180/math.pi)
+                initial_dir = getDirection(section_path[0], section_path[1])
+                self.actions[section_name] = getActionFromRadians(path_angle, initial_dir)
 
         print(self.actions)
 
