@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import rospy
 from custom_msgs.msg import *
-from std_msgs.msg import String
 from helper_functions import *
 
 
@@ -11,7 +10,7 @@ class SectionIdentifier:
         rospy.init_node('section_identifier', anonymous=True)
         self.isInSection = False
 
-        self.pub = rospy.Publisher('section_identifier', String, queue_size=0)
+        self.pub = rospy.Publisher('section_identifier', V2I, queue_size=0)
 
         rospy.Subscriber("truck_state", TruckState, self.callback)
         rospy.Subscriber("rviz_path", Path, self.handleNewPath)
@@ -24,12 +23,15 @@ class SectionIdentifier:
             'roundabout': None,
         }
 
+        self.msg = V2I()
+        self.msg_old = None
+
     def resetActions(self):
         self.actions = {
-            'intersection1': None,
-            'intersection2': None,
-            'intersection3': None,
-            'roundabout': None,
+            "Intersection_1": None,
+            "Intersection_2": None,
+            "Intersection_3": None,
+            "Roundabout": None
         }
 
     def handleNewPath(self, data):
@@ -48,9 +50,9 @@ class SectionIdentifier:
         intersection3 = []
         roundabout = []
 
-        # 1# 600 < x < 1800 and 5600 < y < 7300     #  Intersection 1
-        # 2# 600 < x < 1800 and 3200 < y < 4800    #  Intersection 2
-        # 3# 2000 < x < 3850 and 2550 < y < 5600    #  Roundabout
+        # 1# 600 < x < 1800  and 5600 < y < 7300    #  Intersection 1
+        # 2# 600 < x < 1800  and 3200 < y < 4800    #  Intersection 2
+        # 3# 2000 < x < 3850 and 2300 < y < 5600    #  Roundabout
         # 4# 2600 < x < 3850 and 5600 < y < 7300    #  Intersection 3
 
         for p in path:
@@ -64,10 +66,10 @@ class SectionIdentifier:
                 intersection3.append(p)
 
         return {
-            "intersection1": intersection1,
-            "intersection2": intersection2,
-            "intersection3": intersection3,
-            "roundabout": roundabout
+            "Intersection_1": intersection1,
+            "Intersection_2": intersection2,
+            "Intersection_3": intersection3,
+            "Roundabout": roundabout
         }
 
     def setActionAtSections(self, sections):
@@ -75,27 +77,32 @@ class SectionIdentifier:
 
             if len(section_path) > 1:
                 path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
-                initial_dir = getDirection(section_path[0], section_path[1])
-                self.actions[section_name] = getActionFromRadians(path_angle, initial_dir)
-
-        print(self.actions)
+                self.msg.initial_direction = getDirection(section_path[2], section_path[3])
+                #print "Initial direction = " + self.msg.initial_direction
+                #Set action for each section in custom_msg
+                setattr(self.msg.action, section_name, getActionFromRadians(path_angle, self.msg.initial_direction))
 
     def callback(self, data):
         x = data.p.x
         y = data.p.y
 
         if 600 < x < 1800 and 5600 < y < 7300:
-            self.pub.publish("Intersection_1")
-        elif 600 < x < 1800 and 3200 < y < 4800:
-            self.pub.publish("Intersection_2")
+            self.msg.intersection = "Intersection_1"
+        elif 600 < x < 1800 and 2800 < y < 4800:
+            self.msg.intersection = "Intersection_2"
         elif 2000 < x < 3850 and 2300 < y < 5600:
-            self.pub.publish("Roundabout")
+            self.msg.intersection = "Roundabout"
         elif 2600 < x < 3850 and 5600 < y < 7300:
-            self.pub.publish("Intersection_3")
+            self.msg.intersection = "Intersection_3"
+
+        if self.msg.intersection != "" and self.msg.intersection != self.msg_old:
+            self.pub.publish(self.msg)
+            print self.msg
+            self.msg_old = self.msg.intersection
 
 
 if __name__ == '__main__':
     s = SectionIdentifier()
+
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
-
