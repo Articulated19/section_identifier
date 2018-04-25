@@ -58,7 +58,7 @@ class SectionIdentifier:
                 intersection1.append(p)
             elif 600 < p.x < 1800 and 3200 < p.y < 4800:
                 intersection2.append(p)
-            elif 2000 < p.x < 3850 and 2550 < p.y < 5600:
+            elif 2000 < p.x < 3850 and 2300 < p.y < 5600:
                 roundabout.append(p)
             elif 2600 < p.x < 3850 and 5600 < p.y < 7300:
                 intersection3.append(p)
@@ -88,7 +88,7 @@ class SectionIdentifier:
             self.pub.publish("Intersection_1")
         elif 600 < x < 1800 and 3200 < y < 4800:
             self.pub.publish("Intersection_2")
-        elif 2000 < x < 3850 and 2550 < y < 5600:
+        elif 2000 < x < 3850 and 2300 < y < 5600:
             self.pub.publish("Roundabout")
         elif 2600 < x < 3850 and 5600 < y < 7300:
             self.pub.publish("Intersection_3")
