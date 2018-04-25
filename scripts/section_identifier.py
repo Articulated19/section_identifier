@@ -3,8 +3,6 @@ import rospy
 from custom_msgs.msg import *
 from std_msgs.msg import String
 from helper_functions import *
-from section import *
-import math
 
 
 class SectionIdentifier:
@@ -41,8 +39,8 @@ class SectionIdentifier:
             sections = self.divideIntoSections(path)
             self.setActionAtSections(sections)
 
-
         # Takes a path and sort the points them according to which section they belong to
+
     @staticmethod
     def divideIntoSections(path):
         intersection1 = []
@@ -76,7 +74,7 @@ class SectionIdentifier:
         for section_name, section_path in sections.iteritems():
 
             if len(section_path) > 1:
-                path_angle = getAngleBetweenPoints(section_path[0],section_path[-1])
+                path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
                 initial_dir = getDirection(section_path[0], section_path[1])
                 self.actions[section_name] = getActionFromRadians(path_angle, initial_dir)
 
@@ -95,15 +93,9 @@ class SectionIdentifier:
         elif 2600 < x < 3850 and 5600 < y < 7300:
             self.pub.publish("Intersection_3")
 
+
 if __name__ == '__main__':
     s = SectionIdentifier()
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
-'''     
-    def release_callback(self, data):
-        print("release_callback - out " + "Data: " + data.data)
-        if data.data == "release":
-            self.isInSection = False
-            print("release_callback - in")         
-'''
