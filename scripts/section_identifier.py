@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import rospy
-from custom_msgs.msg import *
 from helper_functions import *
+from std_msgs.msg import *
+from custom_msgs.msg import *
 
 
 class SectionIdentifier:
@@ -25,6 +26,7 @@ class SectionIdentifier:
 
         self.msg = V2I()
         self.msg_old = None
+        self.truck_state = None
 
     def resetActions(self):
         self.actions = {
@@ -77,12 +79,15 @@ class SectionIdentifier:
 
             if len(section_path) > 1:
                 path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
-                self.msg.initial_direction = getDirection(section_path[2], section_path[3])
-                #print "Initial direction = " + self.msg.initial_direction
-                #Set action for each section in custom_msg
+                self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
+                print self.msg.initial_direction
+                # print "Initial direction = " + self.msg.initial_direction
+                # Set action for each section in custom_msg
                 setattr(self.msg.action, section_name, getActionFromRadians(path_angle, self.msg.initial_direction))
 
     def callback(self, data):
+        self.truck_state = data
+
         x = data.p.x
         y = data.p.y
 
