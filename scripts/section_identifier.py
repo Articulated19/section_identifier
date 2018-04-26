@@ -27,6 +27,8 @@ class SectionIdentifier:
         self.msg = V2I()
         self.msg_old = None
         self.truck_state = None
+        self.nodes_in_each_section = None
+        self.gotPath = False
 
     def resetActions(self):
         self.actions = {
@@ -40,8 +42,9 @@ class SectionIdentifier:
         self.resetActions()
         path = data.path
         if (len(path)) > 0:
-            sections = self.divideIntoSections(path)
-            self.setActionAtSections(sections)
+            self.nodes_in_each_section = self.divideIntoSections(path)
+            self.gotPath = True
+            # self.setActionAtSections(sections)
 
         # Takes a path and sort the points them according to which section they belong to
 
@@ -74,16 +77,24 @@ class SectionIdentifier:
             "Roundabout": roundabout
         }
 
-    def setActionAtSections(self, sections):
-        for section_name, section_path in sections.iteritems():
+    def setActionAtSections(self, section, nodes_in_section):
+        if section == "Left_Curve" or section == "Right_Curve": # No action needed at curves
+            return 0
 
-            if len(section_path) > 1:
-                path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
-                self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
-                print self.msg.initial_direction
-                # print "Initial direction = " + self.msg.initial_direction
-                # Set action for each section in custom_msg
-                setattr(self.msg.action, section_name, getActionFromRadians(path_angle, self.msg.initial_direction))
+        section_path = nodes_in_section[section]
+
+        if len(section_path) > 1:
+            #print "Section_path length: " + str(len(section_path))
+            path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
+            self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
+            #print("path0: (" + str(section_path[0].x) + ", " + str(section_path[0].y) + ")")
+            #print("path-1: (" + str(section_path[-1].x) + ", " + str(section_path[-1].y) + ")")
+            #print("truckstate: (" + str(self.truck_state.p.x) + ", " + str(self.truck_state.p.y) + ")")
+            print("Path_Angle : " + str(path_angle))
+            # print self.msg.initial_direction
+            # print "Initial direction = " + self.msg.initial_direction
+            # Set action for each section in custom_msg
+            setattr(self.msg.action, section, getActionFromRadians(path_angle, self.msg.initial_direction))
 
     def callback(self, data):
         self.truck_state = data
@@ -100,7 +111,13 @@ class SectionIdentifier:
         elif 2600 < x < 3850 and 5600 < y < 7300:
             self.msg.intersection = "Intersection_3"
 
-        if self.msg.intersection != "" and self.msg.intersection != self.msg_old:
+        if 600 < x < 3800 and 500 < y <= 2300:
+            self.msg.intersection = "Left_Curve"
+        elif 600 < x < 1800 and 7300 <= y < 9500:
+            self.msg.intersection = "Right_Curve"
+
+        if self.msg.intersection != "" and self.msg.intersection != self.msg_old and self.gotPath :
+            self.setActionAtSections(self.msg.intersection, self.nodes_in_each_section)
             self.pub.publish(self.msg)
             print self.msg
             self.msg_old = self.msg.intersection

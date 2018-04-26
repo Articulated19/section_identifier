@@ -16,35 +16,30 @@ def getAngleBetweenPoints(p1, p2):
 def getActionFromRadians(beta, initial_dir):
     if initial_dir == 'left':
 
-        if -(math.pi / 4) < beta <= math.pi / 4:
-            return 'turn_right'
-        elif -math.pi + math.pi / 4 < beta <= -(math.pi / 4) or 1337:
+        if -math.pi/2-0.08 < beta <= -(math.pi / 3):
             return 'forward'
+        elif -(math.pi / 3) < beta <= (math.pi / 3):
+            return 'turn_right'
         else:
             return 'turn_left'
 
     if initial_dir == 'right':
-        if -(math.pi / 4) < beta <= math.pi / 4:
+        if 0 < beta <= math.pi / 3:
             return 'turn_left'
-        elif -(math.pi + math.pi / 4) < beta <= -math.pi or math.pi - (math.pi / 4) < beta <= math.pi:
+        elif -2*math.pi/3 < beta <= -math.pi or 2*math.pi/3 < beta <= math.pi:
             return 'turn_right'
         else:
             return 'forward'
 
     if initial_dir == 'up':
-
-        if -(math.pi / 4) < beta <= math.pi / 4:
-            return 'forward'
-        elif -math.pi + math.pi / 4 < beta <= -(math.pi / 4):
-            return 'turn_left'
-        else:
+        if math.pi/8 < beta <= (math.pi/2):
             return 'turn_right'
+        else:
+            return 'turn_left'
 
     if initial_dir == 'down':
-        if -math.pi + math.pi / 4 < beta <= -(math.pi / 4):
+        if -math.pi < beta <= -(math.pi / 2):
             return 'turn_right'
-        elif -(math.pi + math.pi / 4) < beta <= -math.pi or math.pi - (math.pi / 4) < beta <= math.pi:
-            return 'forward'
         else:
             return 'turn_left'
 
@@ -59,7 +54,7 @@ def getDirection(p1, p2):
         return 'up'
     elif -math.pi + math.pi / 4 < beta <= -(math.pi / 4):
         return 'left'
-    elif -(math.pi + math.pi / 4) < beta <= -math.pi or math.pi - (math.pi / 4) < beta <= math.pi:
+    elif -math.pi + math.pi / 4 - 0.08 < beta <= -math.pi or math.pi - (math.pi / 4) < beta <= math.pi:
         return 'down'
     else:
         return 'right'
