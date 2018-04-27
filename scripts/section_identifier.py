@@ -102,18 +102,18 @@ class SectionIdentifier:
         x = data.p.x
         y = data.p.y
 
-        if 600 < x < 1800 and 5600 < y < 7300:
+        if 600 < x < 1800 and 4900 < y < 7300:
             self.msg.intersection = "Intersection_1"
         elif 600 < x < 1800 and 2800 < y < 4800:
             self.msg.intersection = "Intersection_2"
         elif 2000 < x < 3850 and 2300 < y < 5600:
             self.msg.intersection = "Roundabout"
-        elif 2600 < x < 3850 and 5600 < y < 7300:
+        elif 2600 < x < 3850 and 5600 < y < 7500:
             self.msg.intersection = "Intersection_3"
 
         if 600 < x < 3800 and 500 < y <= 2300:
             self.msg.intersection = "Left_Curve"
-        elif 600 < x < 1800 and 7300 <= y < 9500:
+        elif 600 < x < 3800 and 7500 <= y < 9500:
             self.msg.intersection = "Right_Curve"
 
         if self.msg.intersection != "" and self.msg.intersection != self.msg_old and self.gotPath :
