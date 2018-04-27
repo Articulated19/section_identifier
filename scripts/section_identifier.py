@@ -84,12 +84,12 @@ class SectionIdentifier:
         section_path = nodes_in_section[section]
 
         if len(section_path) > 1:
-            #print "Section_path length: " + str(len(section_path))
+            # print "Section_path length: " + str(len(section_path))
             path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
             self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
-            #print("path0: (" + str(section_path[0].x) + ", " + str(section_path[0].y) + ")")
-            #print("path-1: (" + str(section_path[-1].x) + ", " + str(section_path[-1].y) + ")")
-            #print("truckstate: (" + str(self.truck_state.p.x) + ", " + str(self.truck_state.p.y) + ")")
+            # print("path0: (" + str(section_path[0].x) + ", " + str(section_path[0].y) + ")")
+            # print("path-1: (" + str(section_path[-1].x) + ", " + str(section_path[-1].y) + ")")
+            # print("truckstate: (" + str(self.truck_state.p.x) + ", " + str(self.truck_state.p.y) + ")")
             print("Path_Angle : " + str(path_angle))
             # print self.msg.initial_direction
             # print "Initial direction = " + self.msg.initial_direction
@@ -97,24 +97,29 @@ class SectionIdentifier:
             setattr(self.msg.action, section, getActionFromRadians(path_angle, self.msg.initial_direction))
 
     def callback(self, data):
-        self.truck_state = data
 
         x = data.p.x
         y = data.p.y
 
-        if 600 < x < 1800 and 4900 < y < 7300:
+        if 600 < x < 1800 and 5400 < y < 7300:
             self.msg.intersection = "Intersection_1"
+            self.truck_state = data
         elif 600 < x < 1800 and 2800 < y < 4800:
             self.msg.intersection = "Intersection_2"
-        elif 2000 < x < 3850 and 2300 < y < 5600:
+            self.truck_state = data
+        elif 2000 < x < 3850 and 2300 < y <= 5700:
             self.msg.intersection = "Roundabout"
-        elif 2600 < x < 3850 and 5600 < y < 7500:
+            self.truck_state = data
+        elif 2600 < x < 3850 and 5700 < y < 7500:
             self.msg.intersection = "Intersection_3"
+            self.truck_state = data
 
         if 600 < x < 3800 and 500 < y <= 2300:
             self.msg.intersection = "Left_Curve"
+            self.truck_state = data
         elif 600 < x < 3800 and 7500 <= y < 9500:
             self.msg.intersection = "Right_Curve"
+            self.truck_state = data
 
         if self.msg.intersection != "" and self.msg.intersection != self.msg_old and self.gotPath :
             self.setActionAtSections(self.msg.intersection, self.nodes_in_each_section)
