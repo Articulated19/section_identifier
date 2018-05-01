@@ -38,6 +38,11 @@ class SectionIdentifier:
         elif 2600 < x < 3850 and 5600 < y < 7400:
             self.pub.publish("Intersection_3")
 
+        if 600 < x < 3800 and 500 < y <= 2300:
+            self.pub.publish("Left_Curve")locals()
+        elif 600 < x < 3800 and 7500 <= y < 9500:
+            self.pub.publish("Right_Curve")
+
 
 if __name__ == '__main__':
     s = SectionIdentifier()
