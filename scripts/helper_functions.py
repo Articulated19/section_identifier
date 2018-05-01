@@ -50,7 +50,9 @@ def getDirection(p1, p2):
 
     beta = math.atan2(dy, dx)
 
-    if -(math.pi / 4) < beta <= math.pi / 4:
+    print "Direction Angle: " + str(beta)
+
+    if -(math.pi / 6) + 0.13 < beta <= math.pi / 6:
         return 'up'
     elif -math.pi + math.pi / 4 < beta <= -(math.pi / 4):
         return 'left'
