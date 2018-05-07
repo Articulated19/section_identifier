@@ -78,7 +78,7 @@ class SectionIdentifier:
         }
 
     def setActionAtSections(self, section, nodes_in_section):
-        if section == "Left_Curve" or section == "Right_Curve": # No action needed at curves
+        if section == "Left_Curve" or section == "Right_Curve":  # No action needed at curves
             return 0
 
         section_path = nodes_in_section[section]
@@ -86,7 +86,8 @@ class SectionIdentifier:
         if len(section_path) > 1:
             # print "Section_path length: " + str(len(section_path))
             path_angle = getAngleBetweenPoints(section_path[0], section_path[-1])
-            self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
+            self.msg.initial_direction = getDirection(section_path[0], section_path[1])
+            # self.msg.initial_direction = getDirection(self.truck_state.p, section_path[1])
             # print("path0: (" + str(section_path[0].x) + ", " + str(section_path[0].y) + ")")
             # print("path-1: (" + str(section_path[-1].x) + ", " + str(section_path[-1].y) + ")")
             # print("truckstate: (" + str(self.truck_state.p.x) + ", " + str(self.truck_state.p.y) + ")")
@@ -121,10 +122,10 @@ class SectionIdentifier:
             self.msg.intersection = "Right_Curve"
             self.truck_state = data
 
-        if self.msg.intersection != "" and self.msg.intersection != self.msg_old and self.gotPath :
+        if self.msg.intersection != "" and self.msg.intersection != self.msg_old and self.gotPath:
             self.setActionAtSections(self.msg.intersection, self.nodes_in_each_section)
-            self.pub.publish(self.msg)
             print self.msg
+            self.pub.publish(self.msg)
             self.msg_old = self.msg.intersection
 
 
